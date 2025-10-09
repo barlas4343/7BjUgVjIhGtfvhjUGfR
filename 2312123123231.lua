@@ -38,7 +38,7 @@ local function fling()
 
 			if hrp then
 				vel = hrp.Velocity
-				hrp.Velocity = vel * 100000 + Vector3.new(0, 100000, 0)
+				hrp.Velocity = vel * 10000000 + Vector3.new(0, 10000000, 0)
 				RunService.RenderStepped:Wait()
 				hrp.Velocity = vel
 				RunService.Stepped:Wait()
