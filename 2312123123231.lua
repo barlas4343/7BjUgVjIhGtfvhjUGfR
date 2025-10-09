@@ -2,7 +2,6 @@ local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
--- Create detection Decal if not exists
 if not ReplicatedStorage:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
 	local detection = Instance.new("Decal")
 	detection.Name = "juisdfj0i32i0eidsuf0iok"
@@ -10,73 +9,103 @@ if not ReplicatedStorage:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
 end
 
 local stopFling = false
-local FLING_FORCE = 50000 -- Insanely high force for instant flinging
-local DETECTION_RANGE = 5 -- Range to detect nearby players (adjustable)
-local COOLDOWN = 0.05 -- Ultra-fast cooldown for continuous flinging
+local connections = {}
+
+local function clearConnections()
+	for _, conn in pairs(connections) do
+		if conn then conn:Disconnect() end
+	end
+	connections = {}
+end
 
 local function fling()
 	local lp = Players.LocalPlayer
-	local lastFlingTime = 0
-
-	-- Cache character and HRP
 	local c, hrp
-	lp.CharacterAdded:Connect(function(char)
+	
+	-- Karakter spawn kontrolü
+	local charConn = lp.CharacterAdded:Connect(function(char)
 		c = char
-		hrp = char:WaitForChild("HumanoidRootPart", 2) -- Reduced wait time
+		hrp = char:WaitForChild("HumanoidRootPart", 1)
+		char:WaitForChild("Humanoid")
 	end)
-
+	connections[#connections + 1] = charConn
+	
 	if lp.Character then
 		c = lp.Character
 		hrp = c:FindFirstChild("HumanoidRootPart")
 	end
-
-	-- Main fling loop using Heartbeat for maximum responsiveness
-	while not stopFling do
-		if c and hrp then
-			local currentTime = tick()
-			if currentTime - lastFlingTime >= COOLDOWN then
-				local hum = c:FindFirstChildOfClass("Humanoid")
-				if hum and hum.Health > 0 then
-					-- Get nearby players
-					for _, player in ipairs(Players:GetPlayers()) do
-						if player ~= lp and player.Character then
-							local targetHrp = player.Character:FindFirstChild("HumanoidRootPart")
-							local targetHum = player.Character:FindFirstChildOfClass("Humanoid")
-							if targetHrp and targetHum and targetHum.Health > 0 then
-								local distance = (hrp.Position - targetHrp.Position).Magnitude
-								if distance <= DETECTION_RANGE then
-									-- Apply massive fling force instantly
-									local flingDirection = (targetHrp.Position - hrp.Position).Unit * FLING_FORCE
-									targetHrp.Velocity = flingDirection + Vector3.new(0, FLING_FORCE * 0.5, 0)
-									-- Add BodyVelocity for extra power
-									local bv = Instance.new("BodyVelocity")
-									bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-									bv.Velocity = flingDirection + Vector3.new(0, FLING_FORCE * 0.3, 0)
-									bv.Parent = targetHrp
-									-- Clean up BodyVelocity after brief duration
-									game:GetService("Debris"):AddItem(bv, 0.1)
-								end
-							end
-						end
+	
+	-- Ultra hızlı ve güçlü fling sistemi
+	local function flingTarget(targetHRP, flingForce)
+		-- Network ownership'i ele geçir
+		pcall(function()
+			targetHRP:SetNetworkOwner(nil)
+			targetHRP:SetNetworkOwner(lp)
+		end)
+		
+		-- Güçlü velocity ve assembly manipülasyonu
+		targetHRP.Velocity = flingForce
+		targetHRP.AssemblyLinearVelocity = flingForce * 1.5
+		targetHRP.CFrame = targetHRP.CFrame + (flingForce.Unit * 10)
+		
+		-- Tüm parçaları fırlat
+		local targetAssembly = targetHRP.Parent
+		for _, part in pairs(targetAssembly:GetChildren()) do
+			if part:IsA("BasePart") and part ~= targetHRP then
+				part.Velocity = flingForce * 0.8
+				part.AssemblyLinearVelocity = flingForce * 1.2
+			end
+		end
+	end
+	
+	local function detectAndFling()
+		if stopFling or not c or not hrp then return end
+		
+		local myPos = hrp.Position
+		for _, player in pairs(Players:GetPlayers()) do
+			if player ~= lp and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+				local targetHRP = player.Character.HumanoidRootPart
+				local targetHum = player.Character:FindFirstChildOfClass("Humanoid")
+				
+				if targetHum and targetHum.Health > 0 then
+					local distance = (myPos - targetHRP.Position).Magnitude
+					
+					-- 30 stud mesafede anında fırlat
+					if distance <= 30 then
+						local flingForce = Vector3.new(
+							math.random(-15000, 15000), -- X ekseni rastgele
+							20000 + math.random(5000, 10000), -- Y ekseni güçlü yukarı
+							math.random(-15000, 15000) -- Z ekseni rastgele
+						)
+						flingTarget(targetHRP, flingForce)
 					end
 				end
-				lastFlingTime = currentTime
 			end
-			-- Apply slight movement to local player to maintain stability
-			hrp.Velocity = hrp.Velocity + Vector3.new(0, 0.1 * (math.random() > 0.5 and 1 or -1), 0)
 		end
-		RunService.Heartbeat:Wait() -- Ultra-fast loop
 	end
+	
+	-- Çift loop ile ultra hızlı detection
+	local heartbeatConn = RunService.Heartbeat:Connect(detectAndFling)
+	local renderConn = RunService.RenderStepped:Connect(detectAndFling)
+	connections[#connections + 1] = heartbeatConn
+	connections[#connections + 1] = renderConn
 end
 
--- API
 return {
 	fling = function()
+		clearConnections()
 		stopFling = false
-		return coroutine.create(fling)
+		return coroutine.create(function()
+			fling()
+			while not stopFling do
+				RunService.Heartbeat:Wait()
+			end
+			clearConnections()
+		end)
 	end,
 	stop = function()
 		stopFling = true
+		clearConnections()
 	end,
 	enableGui = function() end,
 	disableGui = function() end
