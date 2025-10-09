@@ -12,7 +12,7 @@ local stopFling = false -- dışarıdan kontrol için
 
 local function fling()
 	local lp = Players.LocalPlayer
-	local movel = 50
+	local movel = 0
 	local c, hrp, vel
 
 	lp.CharacterAdded:Connect(function(char)
