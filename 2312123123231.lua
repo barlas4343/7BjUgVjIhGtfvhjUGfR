@@ -2,42 +2,65 @@
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
--- Fling işlevini kontrol eden ana fonksiyon
-local function FlingTouch()
+-- Fling'i gerçekleştiren ana fonksiyon
+local function FlingTouchV2()
     local lp = Players.LocalPlayer
-    local c, hrp, vel, movel = nil, nil, nil, 0.1
+    local hrp = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
     
+    if not hrp then return end -- Karakter yoksa işlemi durdur
+
+    -- Fling için kullanacağımız fizik nesnesini (BodyVelocity) oluştur.
+    local bv = Instance.new("BodyVelocity")
+    
+    -- EXTREME HIZ AYARLARI
+    local FlingSpeed = 100000  -- Yüksek hız değeri
+    local MaxForce = Vector3.new(1000000, 1000000, 1000000) -- Maksimum kuvvet (genellikle limitlenir)
+
+    bv.MaxForce = MaxForce
+    bv.Velocity = Vector3.new(0, FlingSpeed, 0) -- Başlangıçta karakteri yukarı fırlat
+    bv.Parent = hrp
+    
+    -- Fling etkisini korumak için kısa bir döngü
+    -- Bu döngü, ana koddan coroutine durdurulana kadar çalışacak.
     while true do 
+        -- Karakteri istenilen hız ve yöne doğru sürekli hareket ettir.
+        -- Bu, sadece anlık hız ataması (Velocity) yapmaktan daha zor tespit edilir.
+        bv.Velocity = hrp.CFrame.LookVector * FlingSpeed + Vector3.new(0, 50000, 0) 
+        
         RunService.Heartbeat:Wait()
-        
-        c = lp.Character
-        hrp = c and c:FindFirstChild("HumanoidRootPart")
-        
-        if hrp then
-            -- ÇOK EXTREME VE YÜKSEK DEĞERLERİ KULLANIN
-            local multiplier = 100000 -- YATAY ÇARPIMI 100 BİN'E ÇIKAR
-            local verticalForce = 100000 -- DİKEY KUVVETİ 100 BİN'E ÇIKAR
-            
-            vel = hrp.Velocity
-            
-            -- ADIM 1: Yüksek hızda çarpma (Fling)
-            hrp.Velocity = vel * multiplier + Vector3.new(0, verticalForce, 0)
-            
-            RunService.RenderStepped:Wait()
-            
-            -- ADIM 2: Hızı eski haline getir (Anti-teleport'u atlatmak için)
-            hrp.Velocity = vel
-            
-            RunService.Stepped:Wait()
-            
-            -- ADIM 3: Küçük titreşim efekti (Stabilite için)
-            hrp.Velocity = vel + Vector3.new(0, movel, 0)
-            movel = -movel 
-        end
     end
+    
+    -- Bu noktaya asla ulaşılamayacak (coroutine durdurulacak)
+    -- ancak yine de temizlik kodunu koymak iyi bir pratik.
+    -- bv:Destroy() 
 end
 
 -- ANA KODA DÖNDÜRÜLECEK FONKSİYON
 return function()
-    return coroutine.wrap(FlingTouch)
+    -- Fling'i başlatmak için bu coroutine'i döndür
+    -- Coroutine sonlandığında, BodyVelocity nesnesinin de silinmesi gerekecek.
+    return function()
+        -- Coroutine'i sarar, böylece durdurulduğunda BodyVelocity temizlenebilir
+        local flingThread = coroutine.create(FlingTouchV2)
+        
+        return function(action)
+            -- 'start' veya 'stop' eylemini işler
+            if action == "start" then
+                coroutine.resume(flingThread)
+            elseif action == "stop" then
+                -- BodyVelocity nesnesini temizle
+                local lp = Players.LocalPlayer
+                local hrp = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+                local bv = hrp and hrp:FindFirstChildOfClass("BodyVelocity")
+                if bv then
+                    bv:Destroy()
+                end
+                
+                -- Coroutine'i durdur (yield ile)
+                if coroutine.status(flingThread) == "running" then
+                    coroutine.yield(flingThread)
+                end
+            end
+        end
+    end
 end
