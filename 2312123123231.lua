@@ -4,17 +4,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- GUI Oluşturma
 local ScreenGui = Instance.new("ScreenGui")
-local Frame = Instance.new("Frame")
-local Frame_2 = Instance.new("Frame")
-local TextLabel = Instance.new("TextLabel")
-local TextButton = Instance.new("TextButton")
-
--- GUI Özellikleri
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.ResetOnSpawn = false
+ScreenGui.Enabled = false -- Başlangıçta GUI görünmez
 print("sub to DuplexScripts")
 
+local Frame = Instance.new("Frame")
 Frame.Parent = ScreenGui
 Frame.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
 Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -22,12 +18,14 @@ Frame.BorderSizePixel = 0
 Frame.Position = UDim2.new(0.388539821, 0, 0.427821517, 0)
 Frame.Size = UDim2.new(0, 158, 0, 110)
 
+local Frame_2 = Instance.new("Frame")
 Frame_2.Parent = Frame
 Frame_2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 Frame_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Frame_2.BorderSizePixel = 0
 Frame_2.Size = UDim2.new(0, 158, 0, 25)
 
+local TextLabel = Instance.new("TextLabel")
 TextLabel.Parent = Frame_2
 TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 TextLabel.BackgroundTransparency = 1.000
@@ -40,6 +38,7 @@ TextLabel.Text = "Touch Fling"
 TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 TextLabel.TextSize = 25.000
 
+local TextButton = Instance.new("TextButton")
 TextButton.Parent = Frame
 TextButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 TextButton.BorderColor3 = Color3.fromRGB(255, 255, 255)
@@ -50,6 +49,11 @@ TextButton.Font = Enum.Font.SourceSansItalic
 TextButton.Text = "OFF"
 TextButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 TextButton.TextSize = 20.000
+
+-- Draggable frame
+local dragScript = Instance.new('LocalScript', Frame)
+dragScript.Parent.Active = true
+dragScript.Parent.Draggable = true
 
 -- Detection nesnesi
 if not ReplicatedStorage:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
@@ -62,30 +66,32 @@ end
 local function fling()
     local lp = Players.LocalPlayer
     local c, hrp, vel, movel = nil, nil, nil, 0.1
-    local active = false -- Toggle kontrolü için boolean (başlangıçta kapalı)
+    local active = false -- İç toggle için boolean (GUI butonu)
 
     -- Kapatma sinyali için bağlantı
     local connection
     connection = game:GetService("Players").LocalPlayer:GetPropertyChangedSignal("Character"):Connect(function()
         if not lp.Character or (lp.Character and lp.Character:FindFirstChild("Humanoid") and lp.Character.Humanoid.Health <= 0) then
-            active = false -- Karakter öldüğünde veya kaybolduğunda fling'i durdur
+            active = false -- Karakter öldüğünde fling durdurulur
+            TextButton.Text = "OFF"
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Touch Fling",
+                Text = "Fling stopped due to character death",
+                Duration = 3
+            })
         end
     end)
 
     -- TextButton toggle mantığı
-    local function onToggle()
+    TextButton.MouseButton1Click:Connect(function()
         active = not active
         TextButton.Text = active and "ON" or "OFF"
-
-        -- Bildirimler
         game:GetService("StarterGui"):SetCore("SendNotification", {
             Title = "Touch Fling",
             Text = active and "Fling turned ON" or "Fling turned OFF",
             Duration = 3
         })
-    end
-
-    TextButton.MouseButton1Click:Connect(onToggle)
+    end)
 
     while true do 
         RunService.Heartbeat:Wait()
@@ -97,7 +103,7 @@ local function fling()
         c = lp.Character
         hrp = c and c:FindFirstChild("HumanoidRootPart")
 
-        -- HATA GİDERME: Eğer karakter ölürse veya HumanoidRootPart yoksa, coroutine durdurulur
+        -- HATA GİDERME: Eğer karakter ölürse veya HumanoidRootPart yoksa
         if not hrp or (c and c:FindFirstChild("Humanoid") and c.Humanoid.Health <= 0) then
             connection:Disconnect()
             active = false
@@ -122,10 +128,13 @@ local function fling()
     end
 end
 
--- Draggable frame
-local dragScript = Instance.new('LocalScript', Frame)
-dragScript.Parent.Active = true
-dragScript.Parent.Draggable = true
-
--- ANA KODA DÖNDÜRÜLECEK FONKSİYON
-return coroutine.wrap(fling)
+-- API: Fling fonksiyonu ve GUI kontrolü için
+return {
+    fling = coroutine.wrap(fling),
+    enableGui = function()
+        ScreenGui.Enabled = true
+    end,
+    disableGui = function()
+        ScreenGui.Enabled = false
+    end
+}
