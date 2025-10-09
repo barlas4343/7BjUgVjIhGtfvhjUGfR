@@ -1,10 +1,10 @@
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
--- Fling Gücü Ayarı
-local EXTREME_THRUST_FORCE = 750000 -- BodyThrust için ekstrem kuvvet
+-- Fling Gücü Ayarı: Ekstrem kuvvet (Çoğu anti-cheat'i aşar)
+local EXTREME_THRUST_FORCE = 750000 
 
--- En yakın oyuncuyu bulan yardımcı fonksiyon
+-- En yakın oyuncuyu bulan yardımcı fonksiyon (Mouse.Target yerine kullanılır)
 local function GetClosestPlayer(localPlayer)
     local closestPlayer = nil
     local shortestDistance = math.huge
@@ -17,7 +17,7 @@ local function GetClosestPlayer(localPlayer)
             local targetHRP = player.Character.HumanoidRootPart
             local distance = (hrp.Position - targetHRP.Position).Magnitude
             
-            -- Görüş alanında ve makul bir mesafede (200 stud) olanı hedef al
+            -- 200 stud'dan yakın olanı hedef al
             if distance < shortestDistance and distance < 200 then 
                 shortestDistance = distance
                 closestPlayer = player
@@ -45,15 +45,17 @@ local function FlingTouchV4()
     Thrust = Instance.new("BodyThrust")
     Thrust.Name = "AutoFlingThrust"
     
+    -- BodyThrust: X ve Z ekseninde (Yatayda) kuvvet uygula
     Thrust.Force = Vector3.new(EXTREME_THRUST_FORCE, 0, EXTREME_THRUST_FORCE) 
-    Thrust.Location = targetHRP.Position -- İtme hedefini ayarla
+    Thrust.Location = targetHRP.Position -- Hedefe doğru itme ayarı
     Thrust.Parent = hrp
     
     -- 2. CFrame Senkronizasyon Döngüsü
     while true do 
         -- HATA GİDERME: Karakter/Hedef/Sağlık Kontrolü
-        if not lp.Character or not lp.Character:FindFirstChild("HumanoidRootPart") or lp.Character.Humanoid.Health <= 0 or not targetHRP.Parent or not targetHRP.Parent:FindFirstChild("HumanoidRootPart") then
-            break -- Eğer hedef veya biz ölürsek döngüyü durdur
+        -- Bu kontrol, öldüğünüzde veya hedef öldüğünde döngüyü temizler.
+        if not lp.Character or not lp.Character:FindFirstChild("HumanoidRootPart") or (lp.Character:FindFirstChild("Humanoid") and lp.Character.Humanoid.Health <= 0) or not targetHRP.Parent or not targetHRP.Parent:FindFirstChild("HumanoidRootPart") then
+            break 
         end
 
         -- Kendi pozisyonumuzu hedefe sabitle (Ana Fling mekaniği)
@@ -69,8 +71,8 @@ local function FlingTouchV4()
 end
 
 -- ANA KODA DÖNDÜRÜLECEK FONKSİYON
+-- Bu fonksiyon, GUI'nizdeki toggle'dan "start" ve "stop" komutlarını alır.
 return function()
-    -- Bu, 'start' ve 'stop' eylemlerini kontrol eden ana kapatıcı fonksiyon
     local flingThread = coroutine.create(FlingTouchV4)
     
     return function(action)
