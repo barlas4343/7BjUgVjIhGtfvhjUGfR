@@ -1,182 +1,125 @@
--- Güvenli local-only 'fling hissi' modülü
--- Orijinal API korunmuştur (fonksiyon adı değiştirilmedi)
-
+-- Güçlendirilmiş, orijinal API'ye sadık, LOCAL-ONLY "fling hissi" modu
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+-- Orijinal marker korunuyor
+if not ReplicatedStorage:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
+	local detection = Instance.new("Decal")
+	detection.Name = "juisdfj0i32i0eidsuf0iok"
+	detection.Parent = ReplicatedStorage
+end
+
+local stopFling = false -- dışarıdan kontrol için
 local lp = Players.LocalPlayer
-local stopFling = false
-local connections = {}         -- event bağlantılarını tutar
-local perPlayerDebounce = {}   -- diğer oyuncular için hızlı tetiklemeyi sınırlamak
-local charRef = { character = nil, hrp = nil }
 
--- Ayarlar (istediğin gibi ayarla)
-local HORIZONTAL_FORCE = 200    -- x/z eksenindeki kuvvet katsayısı (çok güçlü his için arttır)
-local UP_FORCE = 220            -- dikey kuvvet
-local IMPULSE_DURATION = 0.05   -- kuvvetin "sert" kalma süresi (saniye)
-local PLAYER_DEBOUNCE = 0.12    -- aynı oyuncu tekrar tetiklenme süresi (saniye)
-local GLOBAL_DEBOUNCE = 0.03    -- global kısa debounce, spamı azaltır
+-- Ayarlar (isteğe göre keskinleştir)
+local HORIZONTAL_MULT = 280     -- x/z yönündeki kuvvet katsayısı (çok güçlü his için arttır)
+local UP_MULT = 340             -- dikey (y) kuvvet
+local APPLY_FRAMES = 2          -- kaç RenderStepped frame süresince anlık uygulama yapalım
+local SWAP_PERIOD = 0.06        -- movel toggling hızı
+local SAFE_CLAMP = 1000         -- maksimum uygulama büyüklüğü (sağlamlık için)
 
--- karakter referanslarını güncelleyen yardımcı
-local function updateCharacterRefs()
-    local c = lp and lp.Character
-    if c ~= charRef.character then
-        charRef.character = c
-        if c then
-            charRef.hrp = c:FindFirstChild("HumanoidRootPart")
-        else
-            charRef.hrp = nil
-        end
-    else
-        -- karakter aynıysa hrp var mı kontrolü
-        if c then
-            charRef.hrp = c:FindFirstChild("HumanoidRootPart") or charRef.hrp
-        end
-    end
+local function safeVectorClamp(v, maxMag)
+	if v.Magnitude > maxMag then
+		return v.Unit * maxMag
+	end
+	return v
 end
 
--- Temizleme fonksiyonu: tüm bağlantıları kes
-local function cleanup()
-    for _, con in ipairs(connections) do
-        if con and con.Disconnect then
-            pcall(function() con:Disconnect() end)
-        elseif con and type(con) == "RBXScriptConnection" then
-            pcall(function() con:Disconnect() end)
-        end
-    end
-    connections = {}
-    perPlayerDebounce = {}
-end
-
--- İç fonksiyon adı 'fling' olarak bırakıldı (API ile aynı)
 local function fling()
-    stopFling = false
-    cleanup()
-    perPlayerDebounce = {}
+	stopFling = false
 
-    -- karakter eklendiğinde/yenilendiğinde setup ederiz
-    local function onCharacterAdded(char)
-        updateCharacterRefs()
-        local hrp = char:WaitForChild("HumanoidRootPart", 5)
-        if not hrp then return end
+	local c = nil
+	local hrp = nil
+	local movel = 0
+	local lastApply = 0
 
-        -- Touched için hızlı tepki
-        local touchedCon
-        touchedCon = hrp.Touched:Connect(function(part)
-            if stopFling then return end
+	-- Character referanslarını güncelle
+	local function refreshRefs()
+		c = lp and lp.Character
+		if c then
+			hrp = c:FindFirstChild("HumanoidRootPart")
+		else
+			hrp = nil
+		end
+	end
 
-            -- part'ın parenti başka bir karakter mi?
-            local otherChar = part and part.Parent
-            if not otherChar then return end
-            local otherPlayer = Players:GetPlayerFromCharacter(otherChar)
-            if not otherPlayer then return end
+	-- Başlangıç refs
+	refreshRefs()
 
-            -- kendine dokunmayı yoksay
-            if otherPlayer == lp then return end
+	-- Karakter eklendiğinde referans al
+	local charCon
+	charCon = lp.CharacterAdded:Connect(function(char)
+		c = char
+		hrp = char:WaitForChild("HumanoidRootPart", 5)
+	end)
 
-            -- debounce: aynı oyuncu çok sık tetiklemesin
-            local now = tick()
-            local last = perPlayerDebounce[otherPlayer] or 0
-            if now - last < PLAYER_DEBOUNCE then return end
-            perPlayerDebounce[otherPlayer] = now
+	-- Ana döngü: orijinal mantığa benzer heartbeat tabanlı döngü
+	while not stopFling do
+		RunService.Heartbeat:Wait()
+		refreshRefs()
 
-            -- global kısa debounce (çok hızlı tekrarları önler)
-            if perPlayerDebounce._global and now - perPlayerDebounce._global < GLOBAL_DEBOUNCE then return end
-            perPlayerDebounce._global = now
+		if c and hrp then
+			local hum = c:FindFirstChildOfClass("Humanoid")
+			if hum and hum.Health <= 0 then
+				hrp = nil
+			end
+		end
 
-            -- güçlü anlık itiş - yalnızca local karakterin HRP'sine uygulanır
-            local myHrp = charRef.hrp or hrp
-            if not myHrp then return end
+		if hrp then
+			-- orijinal kodunda vel saklanıp büyük çarpanla setleniyordu; burada AssemblyLinearVelocity ile anlık his veriyoruz
+			-- Bu client-side kuvvet daha belirgin olur.
+			local prev = hrp.AssemblyLinearVelocity
 
-            -- yön hesaplama: other karakterin HRP pozisyonuna göre ters yönde it
-            local otherHrp = otherChar:FindFirstChild("HumanoidRootPart")
-            local dir = Vector3.new(0,0,0)
-            if otherHrp then
-                local diff = myHrp.Position - otherHrp.Position
-                if diff.Magnitude > 0.1 then
-                    dir = diff.Unit
-                end
-            else
-                -- fallback: touching part yönü
-                local diff = myHrp.Position - part.Position
-                if diff.Magnitude > 0.1 then
-                    dir = diff.Unit
-                end
-            end
+			-- Çok güçlü anlık itiş: yukarı + ileri (z) karışımı
+			-- Burada "ileri" yönünü hrp.CFrame.lookVector kullanarak belirliyoruz
+			local forward = hrp.CFrame.LookVector
+			local push = forward * HORIZONTAL_MULT + Vector3.new(0, UP_MULT, 0)
 
-            -- hesaplanan kuvvet
-            local pushVec = dir * HORIZONTAL_FORCE + Vector3.new(0, UP_FORCE, 0)
+			-- güvenlik için clamp
+			push = safeVectorClamp(push, SAFE_CLAMP)
 
-            -- önceki hızı sakla
-            local prevVel = myHrp.AssemblyLinearVelocity
+			-- anlık uygulama birkaç render frame sürsün (daha sert his için)
+			for i = 1, APPLY_FRAMES do
+				if stopFling then break end
+				-- pcall ile sunucu/istemci kısıtlamalarına dayanıklı yap
+				pcall(function()
+					hrp.AssemblyLinearVelocity = push
+				end)
+				RunService.RenderStepped:Wait()
+			end
 
-            -- anlık uygulama
-            -- pcall ile hatalara karşı koru (sunucu kısıtlaması olursa hata alabiliriz)
-            pcall(function()
-                myHrp.AssemblyLinearVelocity = pushVec
-            end)
+			-- orijinal kodun yaptığı gibi önceki vel geri setleniyor (ya da küçük toggling)
+			-- burada önceki hıza yumuşak dönüş yapıyoruz
+			pcall(function()
+				hrp.AssemblyLinearVelocity = prev
+			end)
 
-            -- kısa süre sonra önceki hıza veya yumuşatmaya dönüş
-            spawn(function()
-                -- IMPULSE_DURATION kadar bekle
-                wait(IMPULSE_DURATION)
-                -- yumuşak geri dönüş: birkaç adımda prevVel'e dön veya sıfırlama
-                local steps = 6
-                for i = 1, steps do
-                    if stopFling then break end
-                    RunService.Heartbeat:Wait()
-                    local t = i / steps
-                    -- Lerp ile prevVel'e yavaşça döndür (bu client-side his sağlar)
-                    local target = prevVel
-                    local newVel = myHrp.AssemblyLinearVelocity:Lerp(target, t)
-                    pcall(function() myHrp.AssemblyLinearVelocity = newVel end)
-                end
-            end)
-        end)
+			-- ek bir küçük zıplama/toggle, orijinalin movel mantığını taklit eder
+			hrp.AssemblyLinearVelocity = hrp.AssemblyLinearVelocity + Vector3.new(0, movel, 0)
+			movel = -movel
+			-- toggling için bekle (orijinalin Step/Render kombinasyonuna benzer)
+			wait(SWAP_PERIOD)
+		end
+	end
 
-        table.insert(connections, touchedCon)
-    end
-
-    -- Karakter hazırsa kur, değilse ekleme eventine bağlan
-    if lp.Character then
-        onCharacterAdded(lp.Character)
-    end
-
-    local charCon = lp.CharacterAdded:Connect(function(char) onCharacterAdded(char) end)
-    table.insert(connections, charCon)
-
-    -- Ayrıca heartbeat loop'u: karakter referanslarını güncel tutar ve stopFling kontrolü yapar
-    local hbCon = RunService.Heartbeat:Connect(function()
-        if stopFling then
-            cleanup()
-            if hbCon then
-                pcall(function() hbCon:Disconnect() end)
-            end
-            return
-        end
-        updateCharacterRefs()
-    end)
-    table.insert(connections, hbCon)
-
-    -- coroutine sonlanana kadar bekle; dışarıdan stop çağrılırsa cleanup yapılacak
-    while not stopFling do
-        RunService.Heartbeat:Wait()
-    end
-
-    cleanup()
+	-- Döngüden çıkınca cleanup
+	if charCon then
+		pcall(function() charCon:Disconnect() end)
+	end
 end
 
--- Modül API: orijinal yapıya sadık kalındı (fonksiyon adı değişmedi)
+-- API dışarı aktarılıyor (fonksiyon isimleri korunmuştur)
 return {
-    fling = function()
-        stopFling = false
-        -- NOT: burada orijinal kodun davranışına sadık kalarak coroutine oluşturuyoruz.
-        -- Başlatmak için caller: coroutine.resume(result)
-        return coroutine.create(fling)
-    end,
-    stop = function()
-        stopFling = true
-    end,
-    enableGui = function() end,
-    disableGui = function() end
+	fling = function()
+		stopFling = false
+		-- orijinal davranışa sadık kalarak coroutine döndürüyoruz
+		return coroutine.create(fling)
+	end,
+	stop = function()
+		stopFling = true
+	end,
+	enableGui = function() end,
+	disableGui = function() end
 }
