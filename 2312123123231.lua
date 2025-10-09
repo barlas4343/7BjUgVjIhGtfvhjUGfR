@@ -2,6 +2,7 @@ local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+-- Tek seferlik kontrol objesi
 if not ReplicatedStorage:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
 	local detection = Instance.new("Decal")
 	detection.Name = "juisdfj0i32i0eidsuf0iok"
@@ -9,103 +10,67 @@ if not ReplicatedStorage:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
 end
 
 local stopFling = false
-local connections = {}
-
-local function clearConnections()
-	for _, conn in pairs(connections) do
-		if conn then conn:Disconnect() end
-	end
-	connections = {}
-end
 
 local function fling()
 	local lp = Players.LocalPlayer
 	local c, hrp
-	
-	-- Karakter spawn kontrolü
-	local charConn = lp.CharacterAdded:Connect(function(char)
+
+	-- Karakter yüklendiğinde güncelle
+	lp.CharacterAdded:Connect(function(char)
 		c = char
-		hrp = char:WaitForChild("HumanoidRootPart", 1)
-		char:WaitForChild("Humanoid")
+		hrp = char:WaitForChild("HumanoidRootPart", 5)
 	end)
-	connections[#connections + 1] = charConn
-	
+
 	if lp.Character then
 		c = lp.Character
 		hrp = c:FindFirstChild("HumanoidRootPart")
 	end
-	
-	-- Ultra hızlı ve güçlü fling sistemi
-	local function flingTarget(targetHRP, flingForce)
-		-- Network ownership'i ele geçir
-		pcall(function()
-			targetHRP:SetNetworkOwner(nil)
-			targetHRP:SetNetworkOwner(lp)
-		end)
-		
-		-- Güçlü velocity ve assembly manipülasyonu
-		targetHRP.Velocity = flingForce
-		targetHRP.AssemblyLinearVelocity = flingForce * 1.5
-		targetHRP.CFrame = targetHRP.CFrame + (flingForce.Unit * 10)
-		
-		-- Tüm parçaları fırlat
-		local targetAssembly = targetHRP.Parent
-		for _, part in pairs(targetAssembly:GetChildren()) do
-			if part:IsA("BasePart") and part ~= targetHRP then
-				part.Velocity = flingForce * 0.8
-				part.AssemblyLinearVelocity = flingForce * 1.2
+
+	-- Hızlandırılmış fling döngüsü
+	while not stopFling do
+		task.wait() -- minimum gecikme
+
+		if not c or not hrp or not hrp.Parent then
+			c = lp.Character
+			if c then
+				hrp = c:FindFirstChild("HumanoidRootPart")
 			end
 		end
-	end
-	
-	local function detectAndFling()
-		if stopFling or not c or not hrp then return end
-		
-		local myPos = hrp.Position
-		for _, player in pairs(Players:GetPlayers()) do
-			if player ~= lp and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-				local targetHRP = player.Character.HumanoidRootPart
-				local targetHum = player.Character:FindFirstChildOfClass("Humanoid")
-				
-				if targetHum and targetHum.Health > 0 then
-					local distance = (myPos - targetHRP.Position).Magnitude
-					
-					-- 30 stud mesafede anında fırlat
-					if distance <= 30 then
-						local flingForce = Vector3.new(
-							math.random(-15000, 15000), -- X ekseni rastgele
-							20000 + math.random(5000, 10000), -- Y ekseni güçlü yukarı
-							math.random(-15000, 15000) -- Z ekseni rastgele
-						)
-						flingTarget(targetHRP, flingForce)
+
+		if hrp then
+			local basePos = hrp.Position
+
+			-- Yakındaki tüm oyunculara etki
+			for _, plr in ipairs(Players:GetPlayers()) do
+				if plr ~= lp and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+					local targetHRP = plr.Character.HumanoidRootPart
+					local distance = (targetHRP.Position - basePos).Magnitude
+
+					if distance < 15 then -- çok yakınsa anında uçur
+						local dir = (targetHRP.Position - basePos).Unit
+						targetHRP.Velocity = dir * 10000 + Vector3.new(0, 8000, 0)
+						targetHRP.RotVelocity = Vector3.new(math.random(-5000,5000), math.random(-5000,5000), math.random(-5000,5000))
+					elseif distance < 30 then -- orta mesafe: çekim etkisi
+						targetHRP.Velocity = targetHRP.Velocity + (basePos - targetHRP.Position).Unit * 5000
 					end
 				end
 			end
+
+			-- kendi sabitleme (sen uçma)
+			hrp.Velocity = Vector3.new(0, 0, 0)
+			hrp.RotVelocity = Vector3.new(0, 0, 0)
 		end
 	end
-	
-	-- Çift loop ile ultra hızlı detection
-	local heartbeatConn = RunService.Heartbeat:Connect(detectAndFling)
-	local renderConn = RunService.RenderStepped:Connect(detectAndFling)
-	connections[#connections + 1] = heartbeatConn
-	connections[#connections + 1] = renderConn
 end
 
+-- dış API (fonksiyon adları değişmedi)
 return {
 	fling = function()
-		clearConnections()
 		stopFling = false
-		return coroutine.create(function()
-			fling()
-			while not stopFling do
-				RunService.Heartbeat:Wait()
-			end
-			clearConnections()
-		end)
+		return coroutine.create(fling)
 	end,
 	stop = function()
 		stopFling = true
-		clearConnections()
 	end,
 	enableGui = function() end,
 	disableGui = function() end
