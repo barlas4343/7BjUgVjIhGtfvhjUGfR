@@ -1,46 +1,26 @@
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-if not ReplicatedStorage:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
-	local detection = Instance.new("Decal")
-	detection.Name = "juisdfj0i32i0eidsuf0iok"
-	detection.Parent = ReplicatedStorage
-end
 
 local function fling()
 	local lp = Players.LocalPlayer
-	local active = true
 
-	local function getHRP(player)
-		if player.Character then
-			return player.Character:FindFirstChild("HumanoidRootPart")
-		end
-	end
-
-	-- Karakter yeniden doğarsa HRP al
-	lp.CharacterAdded:Connect(function(char)
-		char:WaitForChild("HumanoidRootPart")
-	end)
-
-	while active do
+	while true do
 		RunService.Heartbeat:Wait()
-
-		local myHRP = getHRP(lp)
+		local myHRP = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
 		if not myHRP then continue end
 
-		-- 10 stud çevresindeki diğer oyuncuları fırlat
+		-- diğer oyuncuları kontrol et
 		for _, plr in ipairs(Players:GetPlayers()) do
 			if plr ~= lp then
-				local targetHRP = getHRP(plr)
+				local targetHRP = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
 				if targetHRP then
 					local distance = (targetHRP.Position - myHRP.Position).Magnitude
-					if distance <= 10 then
-						-- aşırı güçlü velocity
+					if distance <= 10 then -- 10 stud mesafede
+						-- sadece diğerlerini uçur
 						targetHRP.Velocity = Vector3.new(
-							(math.random(-500000,500000)),
-							(math.random(3000000,5000000)),
-							(math.random(-500000,500000))
+							math.random(-500000,500000),
+							math.random(3000000,5000000),
+							math.random(-500000,500000)
 						)
 					end
 				end
