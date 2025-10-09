@@ -2,36 +2,35 @@
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
--- Fling durumunu tutan değişkeni buraya tanımlamıyoruz, 
--- çünkü kontrol ana koddan gelecek.
-
 -- Fling işlevini kontrol eden ana fonksiyon
-local function FlingTouch(fling_state_ref)
+local function FlingTouch()
     local lp = Players.LocalPlayer
     local c, hrp, vel, movel = nil, nil, nil, 0.1
     
-    -- "fling_state_ref" referansı true olduğu sürece döngü çalışır
-    -- Not: Lua'da değişken referansı için buraya bir üst tabloya erişim 
-    -- veya global değişken kullanımı gerekebilir. En basit yol, 
-    -- fling döngüsünün kontrolünü ana koda bırakmaktır.
-    
-    -- Bu döngü, ana koddan coroutine içinde çağrılacak ve sadece
-    -- Fling aktifken çalışacaktır.
-    while true do -- Sonsuz döngü. Coroutine durdurulana kadar çalışacak.
+    while true do 
         RunService.Heartbeat:Wait()
         
         c = lp.Character
         hrp = c and c:FindFirstChild("HumanoidRootPart")
         
         if hrp then
-            -- Fling mekaniği
+            -- ÇOK EXTREME VE YÜKSEK DEĞERLERİ KULLANIN
+            local multiplier = 100000 -- YATAY ÇARPIMI 100 BİN'E ÇIKAR
+            local verticalForce = 100000 -- DİKEY KUVVETİ 100 BİN'E ÇIKAR
+            
             vel = hrp.Velocity
-            hrp.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
+            
+            -- ADIM 1: Yüksek hızda çarpma (Fling)
+            hrp.Velocity = vel * multiplier + Vector3.new(0, verticalForce, 0)
             
             RunService.RenderStepped:Wait()
+            
+            -- ADIM 2: Hızı eski haline getir (Anti-teleport'u atlatmak için)
             hrp.Velocity = vel
             
             RunService.Stepped:Wait()
+            
+            -- ADIM 3: Küçük titreşim efekti (Stabilite için)
             hrp.Velocity = vel + Vector3.new(0, movel, 0)
             movel = -movel 
         end
@@ -39,8 +38,6 @@ local function FlingTouch(fling_state_ref)
 end
 
 -- ANA KODA DÖNDÜRÜLECEK FONKSİYON
--- Bu fonksiyon, main script'in fling'i başlatmasını/durdurmasını sağlar.
 return function()
-    -- Fling'i başlatmak için bu coroutine'i döndür
     return coroutine.wrap(FlingTouch)
 end
