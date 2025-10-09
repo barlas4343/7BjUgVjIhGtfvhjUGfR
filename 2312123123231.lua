@@ -1,34 +1,63 @@
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+if not ReplicatedStorage:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
+	local detection = Instance.new("Decal")
+	detection.Name = "juisdfj0i32i0eidsuf0iok"
+	detection.Parent = ReplicatedStorage
+end
+
+local stopFling = false -- dışarıdan kontrol için
 
 local function fling()
 	local lp = Players.LocalPlayer
+	local movel = 0.1
+	local c, hrp, vel
 
-	while true do
+	lp.CharacterAdded:Connect(function(char)
+		c = char
+		hrp = char:WaitForChild("HumanoidRootPart", 5)
+	end)
+
+	if lp.Character then
+		c = lp.Character
+		hrp = c:FindFirstChild("HumanoidRootPart")
+	end
+
+	while not stopFling do
 		RunService.Heartbeat:Wait()
-		local myHRP = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-		if not myHRP then continue end
+		c = lp.Character
+		if c then
+			hrp = c:FindFirstChild("HumanoidRootPart")
+			local hum = c:FindFirstChildOfClass("Humanoid")
 
-		-- diğer oyuncuları kontrol et
-		for _, plr in ipairs(Players:GetPlayers()) do
-			if plr ~= lp then
-				local targetHRP = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
-				if targetHRP then
-					local distance = (targetHRP.Position - myHRP.Position).Magnitude
-					if distance <= 10 then -- 10 stud mesafede
-						-- sadece diğerlerini uçur
-						targetHRP.Velocity = Vector3.new(
-							math.random(-500000,500000),
-							math.random(3000000,5000000),
-							math.random(-500000,500000)
-						)
-					end
-				end
+			if hum and hum.Health <= 0 then
+				hrp = nil
+			end
+
+			if hrp then
+				vel = hrp.Velocity
+				hrp.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
+				RunService.RenderStepped:Wait()
+				hrp.Velocity = vel
+				RunService.Stepped:Wait()
+				hrp.Velocity = vel + Vector3.new(0, movel, 0)
+				movel = -movel
 			end
 		end
 	end
 end
 
+-- API dışarı aktarılıyor
 return {
-	fling = coroutine.wrap(fling)
+	fling = function()
+		stopFling = false
+		return coroutine.create(fling)
+	end,
+	stop = function()
+		stopFling = true
+	end,
+	enableGui = function() end, -- GUI devre dışı
+	disableGui = function() end
 }
