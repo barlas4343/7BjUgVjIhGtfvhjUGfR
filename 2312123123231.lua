@@ -62,17 +62,17 @@ if not ReplicatedStorage:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
     detection.Parent = ReplicatedStorage
 end
 
--- Fling fonksiyonu
+-- Fling fonksiyonu (orijinal mantık + hata kontrolü)
 local function fling()
     local lp = Players.LocalPlayer
     local c, hrp, vel, movel = nil, nil, nil, 0.1
-    local active = false -- İç toggle için boolean (GUI butonu)
+    local active = false -- GUI toggle için boolean
 
     -- Kapatma sinyali için bağlantı
     local connection
-    connection = game:GetService("Players").LocalPlayer:GetPropertyChangedSignal("Character"):Connect(function()
+    connection = lp:GetPropertyChangedSignal("Character"):Connect(function()
         if not lp.Character or (lp.Character and lp.Character:FindFirstChild("Humanoid") and lp.Character.Humanoid.Health <= 0) then
-            active = false -- Karakter öldüğünde fling durdurulur
+            active = false
             TextButton.Text = "OFF"
             game:GetService("StarterGui"):SetCore("SendNotification", {
                 Title = "Touch Fling",
@@ -96,14 +96,13 @@ local function fling()
     while true do 
         RunService.Heartbeat:Wait()
         if not active then
-            -- Fling kapalıyken bekle, ama coroutine ölmesin
             continue
         end
 
         c = lp.Character
         hrp = c and c:FindFirstChild("HumanoidRootPart")
 
-        -- HATA GİDERME: Eğer karakter ölürse veya HumanoidRootPart yoksa
+        -- Hata kontrolü
         if not hrp or (c and c:FindFirstChild("Humanoid") and c.Humanoid.Health <= 0) then
             connection:Disconnect()
             active = false
@@ -128,7 +127,7 @@ local function fling()
     end
 end
 
--- API: Fling fonksiyonu ve GUI kontrolü için
+-- API: Fling fonksiyonu ve GUI kontrolü
 return {
     fling = coroutine.wrap(fling),
     enableGui = function()
