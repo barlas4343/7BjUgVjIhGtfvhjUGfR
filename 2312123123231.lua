@@ -1,65 +1,68 @@
--- Fling Mantığı için gerekli servisleri tanımla
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
--- Fling'i gerçekleştiren ana fonksiyon
-local function FlingTouchV2()
+-- Fling Gücü Ayarı: Önceki 10000 yerine 500000 (Beş yüz bin)
+local EXTREME_FLING_POWER = 500000 
+local DITHER_FORCE = 0.1 -- Titreşim kuvveti
+
+-- Fling işlevini kontrol eden ana fonksiyon
+local function FlingTouch()
     local lp = Players.LocalPlayer
-    local hrp = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+    local c, hrp, vel, movel = nil, nil, nil, DITHER_FORCE
     
-    if not hrp then return end -- Karakter yoksa işlemi durdur
-
-    -- Fling için kullanacağımız fizik nesnesini (BodyVelocity) oluştur.
-    local bv = Instance.new("BodyVelocity")
-    
-    -- EXTREME HIZ AYARLARI
-    local FlingSpeed = 100000  -- Yüksek hız değeri
-    local MaxForce = Vector3.new(1000000, 1000000, 1000000) -- Maksimum kuvvet (genellikle limitlenir)
-
-    bv.MaxForce = MaxForce
-    bv.Velocity = Vector3.new(0, FlingSpeed, 0) -- Başlangıçta karakteri yukarı fırlat
-    bv.Parent = hrp
-    
-    -- Fling etkisini korumak için kısa bir döngü
-    -- Bu döngü, ana koddan coroutine durdurulana kadar çalışacak.
-    while true do 
-        -- Karakteri istenilen hız ve yöne doğru sürekli hareket ettir.
-        -- Bu, sadece anlık hız ataması (Velocity) yapmaktan daha zor tespit edilir.
-        bv.Velocity = hrp.CFrame.LookVector * FlingSpeed + Vector3.new(0, 50000, 0) 
-        
-        RunService.Heartbeat:Wait()
+    -- Karakterin yüklenmesini bekle
+    if not lp.Character or not lp.Character:FindFirstChild("HumanoidRootPart") then
+        lp.CharacterAdded:Wait()
     end
     
-    -- Bu noktaya asla ulaşılamayacak (coroutine durdurulacak)
-    -- ancak yine de temizlik kodunu koymak iyi bir pratik.
-    -- bv:Destroy() 
+    -- Bu coroutine, ana kod tarafından durdurulana kadar çalışacak.
+    while true do 
+        RunService.Heartbeat:Wait()
+        
+        c = lp.Character
+        hrp = c and c:FindFirstChild("HumanoidRootPart")
+        
+        -- Eğer karakterimiz ölmüşse veya HRP yoksa döngüden çık
+        if not hrp or (c and c:FindFirstChild("Humanoid") and c.Humanoid.Health <= 0) then
+            break 
+        end
+        
+        -- Fling Mantığı
+        vel = hrp.Velocity
+        
+        -- ADIM 1: AŞIRI YÜKSEK HIZ UYGULA
+        hrp.Velocity = vel * EXTREME_FLING_POWER + Vector3.new(0, EXTREME_FLING_POWER, 0)
+        
+        RunService.RenderStepped:Wait()
+        
+        -- ADIM 2: HIZI SIFIRLA (Anti-cheat/teleport korumasını atlatmak için)
+        hrp.Velocity = vel
+        
+        RunService.Stepped:Wait()
+        
+        -- ADIM 3: TİTREŞİM EFEKTİ UYGULA
+        hrp.Velocity = vel + Vector3.new(0, movel, 0)
+        movel = -movel
+    end
 end
 
 -- ANA KODA DÖNDÜRÜLECEK FONKSİYON
 return function()
-    -- Fling'i başlatmak için bu coroutine'i döndür
-    -- Coroutine sonlandığında, BodyVelocity nesnesinin de silinmesi gerekecek.
-    return function()
-        -- Coroutine'i sarar, böylece durdurulduğunda BodyVelocity temizlenebilir
-        local flingThread = coroutine.create(FlingTouchV2)
-        
-        return function(action)
-            -- 'start' veya 'stop' eylemini işler
-            if action == "start" then
-                coroutine.resume(flingThread)
-            elseif action == "stop" then
-                -- BodyVelocity nesnesini temizle
-                local lp = Players.LocalPlayer
-                local hrp = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-                local bv = hrp and hrp:FindFirstChildOfClass("BodyVelocity")
-                if bv then
-                    bv:Destroy()
-                end
-                
-                -- Coroutine'i durdur (yield ile)
-                if coroutine.status(flingThread) == "running" then
-                    coroutine.yield(flingThread)
-                end
+    -- Bu, 'start' ve 'stop' eylemlerini kontrol eden ana kapatıcı fonksiyon
+    local flingThread = coroutine.create(FlingTouch)
+    
+    return function(action)
+        if action == "start" then
+            -- Yeni bir coroutine oluştur ve başlat
+            if coroutine.status(flingThread) == "dead" or coroutine.status(flingThread) == "suspended" then
+                flingThread = coroutine.create(FlingTouch)
+            end
+            coroutine.resume(flingThread)
+            
+        elseif action == "stop" then
+            -- Fling'i durdurmak için coroutine'i duraklat
+            if coroutine.status(flingThread) == "running" then
+                coroutine.yield(flingThread)
             end
         end
     end
