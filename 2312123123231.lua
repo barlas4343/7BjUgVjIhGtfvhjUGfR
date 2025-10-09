@@ -9,56 +9,55 @@ if not ReplicatedStorage:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
     detection.Parent = ReplicatedStorage
 end
 
--- Fling fonksiyonu (hızlı, güçlü ve optimize edilmiş)
+-- Sabitler
+local FLING_MULTIPLIER_HORIZONTAL = 50000  -- Yatay hızı kat kat artırır
+local FLING_FORCE_VERTICAL = 75000        -- Aşırı güçlü dikey fırlatma kuvveti
+
+-- Fling fonksiyonu
 local function fling()
     local lp = Players.LocalPlayer
     local active = true
-    local flingForce = 50000 -- Daha güçlü fling için artırıldı
-    local verticalBoost = 25000 -- Daha hızlı yukarı fırlatma
-    local movel = 0.1
-    local c, hrp
+    
+    -- Karakter Yüklenmesini Bekle
+    local c = lp.Character or lp.CharacterAdded:Wait()
+    local hrp = c:WaitForChild("HumanoidRootPart")
 
-    -- Karakter yüklenme olayını optimize et
+    -- Karakter her yeniden yüklendiğinde HumanoidRootPart'ı güncelle
     lp.CharacterAdded:Connect(function(char)
         c = char
-        hrp = char:WaitForChild("HumanoidRootPart", 2) -- Bekleme süresi azaltıldı
+        hrp = char:WaitForChild("HumanoidRootPart", 5)
     end)
 
-    -- Heartbeat yerine daha hızlı Stepped kullanımı
-    RunService.Stepped:Connect(function()
-        if not active or not c or not hrp then
+    local function applyFling()
+        -- Eğer fling kapalıysa veya karakter/HRP yoksa devam etme
+        if not active or not hrp or not c then
             return
         end
 
         local hum = c:FindFirstChildOfClass("Humanoid")
+        
+        -- Karakter ölüyse HRP'yi sıfırla ve bekle
         if hum and hum.Health <= 0 then
             hrp = nil
             return
         end
 
-        -- Yakındaki oyuncuları tespit et ve anında fırlat
-        for _, player in ipairs(Players:GetPlayers()) do
-            if player ~= lp and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                local targetHrp = player.Character.HumanoidRootPart
-                local distance = (hrp.Position - targetHrp.Position).Magnitude
+        -- Mevcut Hızı Al
+        local currentVel = hrp.AssemblyLinearVelocity or hrp.Velocity
+        
+        -- Aşırı Güçlü Fırlatma Uygula
+        -- Yere yapışmayı engellemek ve havaya uçurmak için anlık ve sürekli kuvvet uygular
+        local newVel = currentVel * FLING_MULTIPLIER_HORIZONTAL + Vector3.new(0, FLING_FORCE_VERTICAL, 0)
+        
+        -- Velocity'yi doğrudan atamak yerine, fizik motorunun her adımında itme kuvveti uygulamak daha stabil bir sonuç verebilir.
+        -- Ancak doğrudan Velocity ataması anlık etki için daha iyidir.
 
-                -- Mesafe kontrolü (çok yakınsa fırlat)
-                if distance < 5 then
-                    local originalVel = targetHrp.Velocity
-                    targetHrp.Velocity = (targetHrp.Position - hrp.Position).Unit * flingForce + Vector3.new(0, verticalBoost, 0)
-                    RunService.RenderStepped:Wait() -- Hızlı geri dönüş için
-                    targetHrp.Velocity = originalVel
-                end
-            end
-        end
+        hrp.Velocity = newVel
+    end
 
-        -- Kendi karakteri için hafif hareket (stabilite için)
-        if hrp then
-            local vel = hrp.Velocity
-            hrp.Velocity = vel + Vector3.new(0, movel, 0)
-            movel = -movel
-        end
-    end)
+    -- Ana Döngü: Çok daha hızlı aktivasyon için Stepped kullan
+    -- Stepped, fizik motorunun simülasyonundan hemen önce çalışır, bu da daha hızlı tepki demektir.
+    RunService.Stepped:Connect(applyFling)
 end
 
 -- API sadece fling fonksiyonu döner
