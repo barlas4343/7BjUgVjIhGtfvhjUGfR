@@ -8,44 +8,48 @@ if not ReplicatedStorage:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
 	detection.Parent = ReplicatedStorage
 end
 
-local stopFling = false
+local stopFling = false -- dışarıdan kontrol için
 
--- ⚡ Ultra hızlı, yakından geçen herkesi anında uçuran fling sistemi ⚡
 local function fling()
 	local lp = Players.LocalPlayer
-	local char = lp.Character or lp.CharacterAdded:Wait()
-	local hrp = char:WaitForChild("HumanoidRootPart")
-	
-	local power = 50000  -- 🔥 Uçurma gücü (artırılabilir)
-	local range = 10     -- 🔥 Etki mesafesi (metre)
-	
+	local movel = 0
+	local c, hrp, vel
+
+	lp.CharacterAdded:Connect(function(char)
+		c = char
+		hrp = char:WaitForChild("HumanoidRootPart", 5)
+	end)
+
+	if lp.Character then
+		c = lp.Character
+		hrp = c:FindFirstChild("HumanoidRootPart")
+	end
+
 	while not stopFling do
 		RunService.Heartbeat:Wait()
+		c = lp.Character
+		if c then
+			hrp = c:FindFirstChild("HumanoidRootPart")
+			local hum = c:FindFirstChildOfClass("Humanoid")
 
-		if not lp.Character or not lp.Character:FindFirstChild("HumanoidRootPart") then
-			continue
-		end
-		
-		hrp = lp.Character.HumanoidRootPart
-		local myPos = hrp.Position
+			if hum and hum.Health <= 0 then
+				hrp = nil
+			end
 
-		-- Etraftaki oyuncuları kontrol et
-		for _, plr in pairs(Players:GetPlayers()) do
-			if plr ~= lp and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-				local targetHRP = plr.Character.HumanoidRootPart
-				local distance = (targetHRP.Position - myPos).Magnitude
-
-				if distance <= range then
-					-- 💥 Yakın oyuncuyu anında uçur!
-					local flingDir = (targetHRP.Position - myPos).Unit * power
-					targetHRP.Velocity = flingDir + Vector3.new(0, power / 2, 0)
-				end
+			if hrp then
+				vel = hrp.Velocity
+				hrp.Velocity = vel * 100000 + Vector3.new(0, 100000, 0)
+				RunService.RenderStepped:Wait()
+				hrp.Velocity = vel
+				RunService.Stepped:Wait()
+				hrp.Velocity = vel + Vector3.new(0, movel, 0)
+				movel = -movel
 			end
 		end
 	end
 end
 
--- API dışarı aktarımı
+-- API dışarı aktarılıyor
 return {
 	fling = function()
 		stopFling = false
@@ -54,6 +58,6 @@ return {
 	stop = function()
 		stopFling = true
 	end,
-	enableGui = function() end,
+	enableGui = function() end, -- GUI devre dışı
 	disableGui = function() end
 }
