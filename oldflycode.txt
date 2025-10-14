@@ -1,0 +1,122 @@
+
+local flyVelocity = nil
+local bodyGyro = nil
+local humanoid = nil -- humanoid'i lokal değişken olarak tanımla
+
+local function toggleFly(state)
+    if flyEnabled == state then return end
+    flyEnabled = state
+    Config.flyEnabled = state
+    saveConfig()
+    local character = LocalPlayer.Character
+    local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+    local torso = character and character:FindFirstChild("UpperTorso") -- Eğer R6 ise "Torso", R15 ise "UpperTorso"
+    humanoid = character and character:FindFirstChildOfClass("Humanoid") -- humanoid'i burada ata
+
+    if not rootPart or not torso or not humanoid then return end
+    
+    -- Fly mode açıldığında önce eski BodyVelocity'yi yok et
+    if flyVelocity then
+        flyVelocity:Destroy()
+        flyVelocity = nil
+    end
+    
+    -- Fly mode açıldığında, yeni BodyVelocity oluştur ve RootPart'e ekle
+    if state then
+        flyVelocity = Instance.new("BodyVelocity")
+        flyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        flyVelocity.Velocity = Vector3.new(0, 0, 0)
+        flyVelocity.Parent = rootPart
+        
+        -- BodyGyro ekleyerek karakterin yönünü kameraya göre ayarla
+        bodyGyro = Instance.new("BodyGyro")
+        bodyGyro.P = 9e4
+        bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+        bodyGyro.CFrame = torso.CFrame
+        bodyGyro.Parent = torso
+
+        -- **Tüm çalışan animasyonları durdur**
+        local animator = humanoid:FindFirstChildOfClass("Animator")
+        if animator then
+            for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+                track:Stop()
+            end
+        end
+
+        -- "Animate" scriptini devre dışı bırak
+        local animate = character:FindFirstChild("Animate")
+        if animate then
+            animate.Enabled = false
+        end
+        
+        -- "Humanoid" animasyonlarını devre dışı bırak
+        humanoid.PlatformStand = true
+        humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+        
+        -- **Bildirimi Göster**
+        local success, err = pcall(function()
+            Notification:Notify({title = "Notification", Content = "Fly Mode - " .. (state and "Enabled" or "Disabled")})
+        end)
+        if not success then
+            showFallbackNotification("Fly Mode -", "Fly Mode - " .. (state and "Enabled" or "Disabled"))
+        end
+    else
+        -- Fly mode kapandığında, BodyGyro ve BodyVelocity'yi kaldır
+        if bodyGyro then
+            bodyGyro:Destroy()
+            bodyGyro = nil
+        end
+        
+        if flyVelocity then
+            flyVelocity:Destroy()
+            flyVelocity = nil
+        end
+        
+        -- "Animate" scriptini tekrar etkinleştir
+        local animate = character:FindFirstChild("Animate")
+        if animate then
+            animate.Enabled = true
+        end
+        
+        -- "Humanoid" animasyonlarını geri yükle
+        humanoid.PlatformStand = false
+        humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+
+        -- **Bildirimi Göster**
+        local success, err = pcall(function()
+            Notification:Notify({title = "Notification", Content = "Fly Mode - " .. (state and "Enabled" or "Disabled")})
+        end)
+        if not success then
+            showFallbackNotification("Fly Mode -", "Fly Mode - " .. (state and "Enabled" or "Disabled"))
+        end
+    end
+end
+
+-- F tuşuna basıldığında Fly mode açıp kapat
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end -- Eğer oyun işlem yapıyorsa, geç.
+if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.F then
+        toggleFly(not flyEnabled) -- Fly mode aç veya kapat
+    end
+end)
+
+local function updateFlySpeed(value)
+    flySpeed = value
+    Config.flySpeed = value
+    saveConfig()
+end
+
+-- Yön ve hareketleri güncelleyici fonksiyon
+game:GetService("RunService").Heartbeat:Connect(function()
+    if flyEnabled and flyVelocity and humanoid then
+        -- Kamera yönüne göre hareket
+        local camCF = game.Workspace.CurrentCamera.CFrame
+        local lookVector = camCF.LookVector
+        
+        -- BodyVelocity ile hareket
+        flyVelocity.Velocity = lookVector * flySpeed + Vector3.new(0, flyVelocity.Velocity.Y, 0)
+        
+        -- BodyGyro ile dönüş
+        bodyGyro.CFrame = camCF
+    end
+end)
