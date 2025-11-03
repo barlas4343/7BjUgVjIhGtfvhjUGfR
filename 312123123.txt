@@ -1673,7 +1673,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 	ColorPickerFrame.Name = Fatality:RandomString()
 	ColorPickerFrame.Parent = OwnWindow
 	ColorPickerFrame.AnchorPoint = Vector2.new(0.5, 0)
-	ColorPickerFrame.BackgroundColor3 = Color3.fromRGB(19, 19, 19)
+	ColorPickerFrame.BackgroundColor3 = Color3.fromRGB(27, 24, 52)
 	ColorPickerFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	ColorPickerFrame.BorderSizePixel = 0
 	ColorPickerFrame.ClipsDescendants = true
@@ -6618,7 +6618,7 @@ function Fatality:CreateNotifier(): Notifier
 			notify_block.Name = Fatality:RandomString()
 			notify_block.Parent = notify
 			notify_block.AnchorPoint = Vector2.new(0.5, 0)
-			notify_block.BackgroundColor3 = Color3.fromRGB(19, 19, 19)
+			notify_block.BackgroundColor3 = Color3.fromRGB(27, 24, 52)
 			notify_block.BackgroundTransparency = 1
 			notify_block.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			notify_block.BorderSizePixel = 0
