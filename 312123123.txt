@@ -1673,7 +1673,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 	ColorPickerFrame.Name = Fatality:RandomString()
 	ColorPickerFrame.Parent = OwnWindow
 	ColorPickerFrame.AnchorPoint = Vector2.new(0.5, 0)
-	ColorPickerFrame.BackgroundColor3 = Color3.fromRGB(27, 24, 52)
+	ColorPickerFrame.BackgroundColor3 = Color3.fromRGB(19, 19, 19)
 	ColorPickerFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	ColorPickerFrame.BorderSizePixel = 0
 	ColorPickerFrame.ClipsDescendants = true
