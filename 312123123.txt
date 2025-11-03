@@ -2879,7 +2879,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		Fatality:CreateHover(Button,function(value)
 			if value then
 				Fatality:CreateAnimation(Button,0.45,{
-					BackgroundColor3 = Color3.fromRGB(14, 14, 14)
+					BackgroundColor3 = Color3.fromRGB(27, 24, 52)
 				})
 			else
 				Fatality:CreateAnimation(Button,0.45,{
