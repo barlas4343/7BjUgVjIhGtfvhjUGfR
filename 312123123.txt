@@ -1307,7 +1307,7 @@ function Fatality:CreateOption(OptionButton: ImageButton): Elements
 	ExtElementFrame.Name = Fatality:RandomString()
 	ExtElementFrame.Parent = OwnWindow
 	ExtElementFrame.AnchorPoint = Vector2.new(0.5, 0)
-	ExtElementFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+	ExtElementFrame.BackgroundColor3 = Color3.fromRGB(27, 24, 52)
 	ExtElementFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	ExtElementFrame.BorderSizePixel = 0
 	ExtElementFrame.ClipsDescendants = true
@@ -3694,7 +3694,7 @@ function Fatality:CreateConfigWindow(Root: ScreenGui , Fatal , Button: ImageButt
 	ConfigWindowFrame.Name = "ConfigWindowFrame"
 	ConfigWindowFrame.Parent = Root
 	ConfigWindowFrame.AnchorPoint = Vector2.new(0,1)
-	ConfigWindowFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+	ConfigWindowFrame.BackgroundColor3 = Color3.fromRGB(27, 24, 52)
 	ConfigWindowFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	ConfigWindowFrame.BorderSizePixel = 0
 	ConfigWindowFrame.ClipsDescendants = true
@@ -5129,7 +5129,7 @@ function Fatality.new(Window: Window)
 			Main.Name = "Main"
 			Main.Parent = Preview
 			Main.AnchorPoint = Vector2.new(0.5, 1)
-			Main.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+			Main.BackgroundColor3 = Color3.fromRGB(27, 24, 52)
 			Main.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Main.BorderSizePixel = 0
 			Main.Position = UDim2.new(0.5, 0, 1, -1)
@@ -5253,7 +5253,7 @@ function Fatality.new(Window: Window)
 			Elements.Name = Fatality:RandomString()
 			Elements.Parent = ListBox
 			Elements.AnchorPoint = Vector2.new(0.5, 1)
-			Elements.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+			Elements.BackgroundColor3 = Color3.fromRGB(27, 24, 52)
 			Elements.BackgroundTransparency = 0
 			Elements.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Elements.BorderSizePixel = 0
@@ -5712,7 +5712,7 @@ function Fatality.new(Window: Window)
 
 			Section.Name = Fatality:RandomString()
 			Section.Parent = (string.lower(Config.Position) == 'left' and Left) or (string.lower(Config.Position) == 'center' and Center) or Right;
-			Section.BackgroundColor3 = Color3.fromRGB(19, 19, 19)
+			Section.BackgroundColor3 = Color3.fromRGB(33, 27, 69)
 			Section.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Section.BorderSizePixel = 0
 			Section.ClipsDescendants = true
@@ -5721,7 +5721,7 @@ function Fatality.new(Window: Window)
 			Elements.Name = Fatality:RandomString()
 			Elements.Parent = Section
 			Elements.AnchorPoint = Vector2.new(0.5, 1)
-			Elements.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+			Elements.BackgroundColor3 = Color3.fromRGB(33, 27, 69)
 			Elements.BackgroundTransparency = 0
 			Elements.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Elements.BorderSizePixel = 0
