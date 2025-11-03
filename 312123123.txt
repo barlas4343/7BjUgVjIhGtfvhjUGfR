@@ -2184,7 +2184,7 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 	DropdownItemFrame.Name = Fatality:RandomString()
 	DropdownItemFrame.Parent = Window
 	DropdownItemFrame.AnchorPoint = Vector2.new(0, 0)
-	DropdownItemFrame.BackgroundColor3 = Color3.fromRGB(27, 24, 52)
+	DropdownItemFrame.BackgroundColor3 = Color3.fromRGB(19, 19, 19)
 	DropdownItemFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	DropdownItemFrame.BorderSizePixel = 0
 	DropdownItemFrame.ClipsDescendants = true
@@ -4392,7 +4392,7 @@ function Fatality.new(Window: Window)
 	FatalFrame.Name = Fatality:RandomString()
 	FatalFrame.Parent = Fatalitywin
 	FatalFrame.AnchorPoint = Vector2.new(0.5, 0)
-	FatalFrame.BackgroundColor3 = Color3.fromRGB(27, 24, 52)
+	FatalFrame.BackgroundColor3 = Color3.fromRGB(19, 19, 19)
 	FatalFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	FatalFrame.BorderSizePixel = 0
 	FatalFrame.Position = UDim2.new(0.5, 0, 0.2);
