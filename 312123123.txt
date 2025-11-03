@@ -5103,7 +5103,7 @@ function Fatality.new(Window: Window)
 
 			Preview.Name = "Preview"
 			Preview.Parent = (string.lower(Config.Position) == 'left' and Left) or (string.lower(Config.Position) == 'center' and Center) or Right;
-			Preview.BackgroundColor3 = Color3.fromRGB(27, 24, 52)
+			Preview.BackgroundColor3 = Color3.fromRGB(19, 19, 19)
 			Preview.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Preview.BorderSizePixel = 0
 			Preview.ClipsDescendants = true
@@ -5240,7 +5240,7 @@ function Fatality.new(Window: Window)
 
 			ListBox.Name = Fatality:RandomString()
 			ListBox.Parent = (string.lower(Config.Position) == 'left' and Left) or (string.lower(Config.Position) == 'center' and Center) or Right;
-			ListBox.BackgroundColor3 = Color3.fromRGB(27, 24, 52)
+			ListBox.BackgroundColor3 = Color3.fromRGB(19, 19, 19)
 			ListBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			ListBox.BorderSizePixel = 0
 			ListBox.ClipsDescendants = true
@@ -5712,7 +5712,7 @@ function Fatality.new(Window: Window)
 
 			Section.Name = Fatality:RandomString()
 			Section.Parent = (string.lower(Config.Position) == 'left' and Left) or (string.lower(Config.Position) == 'center' and Center) or Right;
-			Section.BackgroundColor3 = Color3.fromRGB(27, 24, 52)
+			Section.BackgroundColor3 = Color3.fromRGB(19, 19, 19)
 			Section.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Section.BorderSizePixel = 0
 			Section.ClipsDescendants = true
