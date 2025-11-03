@@ -1318,7 +1318,7 @@ function Fatality:CreateOption(OptionButton: ImageButton): Elements
 	UICorner.CornerRadius = UDim.new(0, 2)
 	UICorner.Parent = ExtElementFrame
 
-	UIStroke.Color = Color3.fromRGB(29, 29, 29)
+	UIStroke.Color = Color3.fromRGB(33, 27, 69)
 	UIStroke.Parent = ExtElementFrame
 
 	DropShadow.Name = Fatality:RandomString()
@@ -1685,7 +1685,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 	UICorner.CornerRadius = UDim.new(0, 2)
 	UICorner.Parent = ColorPickerFrame
 
-	UIStroke.Color = Color3.fromRGB(29, 29, 29)
+	UIStroke.Color = Color3.fromRGB(33, 27, 69)
 	UIStroke.Parent = ColorPickerFrame
 
 	DropShadow.Name = Fatality:RandomString()
@@ -1728,7 +1728,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 	UICorner_2.CornerRadius = UDim.new(0, 2)
 	UICorner_2.Parent = ColorPickBox
 
-	UIStroke_2.Color = Color3.fromRGB(29, 29, 29)
+	UIStroke_2.Color = Color3.fromRGB(33, 27, 69)
 	UIStroke_2.Parent = ColorPickBox
 
 	ColorRedGreenBlue.Name = Fatality:RandomString()
@@ -1759,7 +1759,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 	ColorRGBSlide.ZIndex = 207
 
 	UIStroke_3.Transparency = 0.750
-	UIStroke_3.Color = Color3.fromRGB(29, 29, 29)
+	UIStroke_3.Color = Color3.fromRGB(33, 27, 69)
 	UIStroke_3.Parent = ColorRGBSlide
 
 	ColorOpc.Name = Fatality:RandomString()
@@ -5297,7 +5297,7 @@ function Fatality.new(Window: Window)
 			UICorner_2.Parent = SearchBox
 
 			UIStroke_2.Transparency = 0.750
-			UIStroke_2.Color = Color3.fromRGB(29, 29, 29)
+			UIStroke_2.Color = Color3.fromRGB(33, 27, 69)
 			UIStroke_2.Parent = SearchBox
 
 			OptionButton.Name = Fatality:RandomString()
@@ -5330,7 +5330,7 @@ function Fatality.new(Window: Window)
 			UICorner_3.Parent = ScrollingFrame
 
 			UIStroke_3.Transparency = 0.750
-			UIStroke_3.Color = Color3.fromRGB(29, 29, 29)
+			UIStroke_3.Color = Color3.fromRGB(33, 27, 69)
 			UIStroke_3.Parent = ScrollingFrame
 
 			UIListLayout.Parent = ScrollingFrame
@@ -5728,7 +5728,7 @@ function Fatality.new(Window: Window)
 			Elements.Position = UDim2.new(0.5, 0, 1, -1)
 			Elements.Size = UDim2.new(1, -5, 1, -10)
 
-			UIStroke.Color = Color3.fromRGB(29, 29, 29)
+			UIStroke.Color = Color3.fromRGB(33, 27, 69)
 			UIStroke.Parent = Elements
 
 			UICorner.CornerRadius = UDim.new(0, 2)
@@ -5960,7 +5960,7 @@ function Fatality.new(Window: Window)
 		SearchFrame.ZIndex = 100
 		SearchFrame.ClipsDescendants = true
 
-		UIStroke.Color = Color3.fromRGB(29, 29, 29)
+		UIStroke.Color = Color3.fromRGB(33, 27, 69)
 		UIStroke.Parent = SearchFrame
 
 		UICorner.CornerRadius = UDim.new(0, 2)
@@ -5995,7 +5995,7 @@ function Fatality.new(Window: Window)
 		UICorner_2.Parent = SearchBox
 
 		UIStroke_2.Transparency = 0.650
-		UIStroke_2.Color = Color3.fromRGB(29, 29, 29)
+		UIStroke_2.Color = Color3.fromRGB(33, 27, 69)
 		UIStroke_2.Parent = SearchBox
 
 		TextBox.Parent = SearchBox
