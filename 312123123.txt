@@ -1,4 +1,12 @@
+--[[
+    		Fatality-Dark Interface
 
+    Author: 4lpaca
+    License: MIT
+    Github: https://github.com/4lpaca-pin/Fatality
+--]]
+
+-- Export Types --
 export type Window = {
 	Name: string,
 	Keybind: string | Enum.KeyCode,
@@ -281,7 +289,7 @@ Fatality.FontSemiBold = Font.new('rbxasset://fonts/families/GothamSSm.json',Enum
 Fatality.Flags = {};
 Fatality.Colors = {
 	Black = Color3.fromRGB(27, 24, 52),
-	Main = Color3.fromRGB(253, 1, 56)
+	Main = Color3.fromRGB(253, 1, 68)
 };
 Fatality.DragBlacklist = {};
 Fatality.Version = '1.6';
