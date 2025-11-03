@@ -5952,7 +5952,7 @@ function Fatality.new(Window: Window)
 		SearchFrame.Name = Fatality:RandomString()
 		SearchFrame.Parent = Fatalitywin;
 		SearchFrame.AnchorPoint = Vector2.new(0, 1)
-		SearchFrame.BackgroundColor3 = Color3.fromRGB(19, 19, 19)
+		SearchFrame.BackgroundColor3 = Color3.fromRGB(27, 24, 52)
 		SearchFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		SearchFrame.BorderSizePixel = 0
 		SearchFrame.Position = UDim2.new(4,0,4,0)
