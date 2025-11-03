@@ -5721,7 +5721,7 @@ function Fatality.new(Window: Window)
 			Elements.Name = Fatality:RandomString()
 			Elements.Parent = Section
 			Elements.AnchorPoint = Vector2.new(0.5, 1)
-			Elements.BackgroundColor3 = Color3.fromRGB(27, 24, 52)
+			Elements.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
 			Elements.BackgroundTransparency = 0
 			Elements.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Elements.BorderSizePixel = 0
