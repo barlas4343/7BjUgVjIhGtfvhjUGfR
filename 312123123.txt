@@ -1786,13 +1786,13 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 	ColorOptSlide.ZIndex = 207
 
 	UIStroke_4.Transparency = 0.750
-	UIStroke_4.Color = Color3.fromRGB(29, 29, 29)
+	UIStroke_4.Color = Color3.fromRGB(33, 27, 69)
 	UIStroke_4.Parent = ColorOptSlide
 
 	UIGradient_2.Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0.00, 1.00), NumberSequenceKeypoint.new(1.00, 0.00)}
 	UIGradient_2.Parent = ColorOpc
 
-	UIStroke_5.Color = Color3.fromRGB(29, 29, 29)
+	UIStroke_5.Color = Color3.fromRGB(33, 27, 69)
 	UIStroke_5.Parent = ColorOpc
 
 	ColorOpt.Name = Fatality:RandomString()
@@ -2195,7 +2195,7 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 	UICorner.CornerRadius = UDim.new(0, 2)
 	UICorner.Parent = DropdownItemFrame
 
-	UIStroke.Color = Color3.fromRGB(29, 29, 29)
+	UIStroke.Color = Color3.fromRGB(33, 27, 69)
 	UIStroke.Parent = DropdownItemFrame
 
 	DropShadow.Name = Fatality:RandomString()
@@ -3705,7 +3705,7 @@ function Fatality:CreateConfigWindow(Root: ScreenGui , Fatal , Button: ImageButt
 	UICorner.CornerRadius = UDim.new(0, 2)
 	UICorner.Parent = ConfigWindowFrame
 
-	UIStroke.Color = Color3.fromRGB(29, 29, 29)
+	UIStroke.Color = Color3.fromRGB(33, 27, 69)
 	UIStroke.Parent = ConfigWindowFrame
 
 	DropShadow.Name = "DropShadow"
@@ -3737,7 +3737,7 @@ function Fatality:CreateConfigWindow(Root: ScreenGui , Fatal , Button: ImageButt
 	UICorner_2.Parent = ScrollingFrame
 
 	UIStroke_2.Transparency = 0.750
-	UIStroke_2.Color = Color3.fromRGB(29, 29, 29)
+	UIStroke_2.Color = Color3.fromRGB(33, 27, 69)
 	UIStroke_2.Parent = ScrollingFrame
 
 	UIListLayout.Parent = ScrollingFrame
@@ -3763,7 +3763,7 @@ function Fatality:CreateConfigWindow(Root: ScreenGui , Fatal , Button: ImageButt
 	InputFrame.ZIndex = 208
 
 	UIStroke_3.Transparency = 0.750
-	UIStroke_3.Color = Color3.fromRGB(29, 29, 29)
+	UIStroke_3.Color = Color3.fromRGB(33, 27, 69)
 	UIStroke_3.Parent = InputFrame
 
 	UICorner_3.CornerRadius = UDim.new(0, 3)
@@ -4429,7 +4429,7 @@ function Fatality.new(Window: Window)
 	HeaderLine.Name = Fatality:RandomString()
 	HeaderLine.Parent = Header
 	HeaderLine.AnchorPoint = Vector2.new(0, 1)
-	HeaderLine.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+	HeaderLine.BackgroundColor3 = Color3.fromRGB(33, 27, 69)
 	HeaderLine.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	HeaderLine.BorderSizePixel = 0
 	HeaderLine.Position = UDim2.new(0, 0, 1, 0)
