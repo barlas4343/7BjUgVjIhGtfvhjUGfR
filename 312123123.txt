@@ -1,12 +1,4 @@
---[[
-    		Fatality-Dark Interface
 
-    Author: 4lpaca
-    License: MIT
-    Github: https://github.com/4lpaca-pin/Fatality
---]]
-
--- Export Types --
 export type Window = {
 	Name: string,
 	Keybind: string | Enum.KeyCode,
