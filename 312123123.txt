@@ -4591,7 +4591,7 @@ function Fatality.new(Window: Window)
 
 	HeaderLine_2.Name = Fatality:RandomString()
 	HeaderLine_2.Parent = Bottom
-	HeaderLine_2.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+	HeaderLine_2.BackgroundColor3 = Color3.fromRGB(33, 27, 69)
 	HeaderLine_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	HeaderLine_2.BorderSizePixel = 0
 	HeaderLine_2.Size = UDim2.new(1, 0, 0, 1)
@@ -5136,7 +5136,7 @@ function Fatality.new(Window: Window)
 			Main.Size = UDim2.new(1, -5, 1, -10)
 			Main.ZIndex = 17
 
-			UIStroke.Color = Color3.fromRGB(29, 29, 29)
+			UIStroke.Color = Color3.fromRGB(33, 27, 69)
 			UIStroke.Parent = Main
 
 			UICorner.CornerRadius = UDim.new(0, 2)
@@ -5261,7 +5261,7 @@ function Fatality.new(Window: Window)
 			Elements.Size = UDim2.new(1, -5, 1, -10)
 			Elements.ZIndex = 10
 
-			UIStroke.Color = Color3.fromRGB(29, 29, 29)
+			UIStroke.Color = Color3.fromRGB(33, 27, 69)
 			UIStroke.Parent = Elements
 
 			UICorner.CornerRadius = UDim.new(0, 2)
