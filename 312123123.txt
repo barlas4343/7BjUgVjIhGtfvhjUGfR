@@ -4452,7 +4452,7 @@ function Fatality.new(Window: Window)
 	HeaderText.Font = Enum.Font.GothamBold
 	HeaderText.Text = Window.Name
 	HeaderText.TextColor3 = Color3.fromRGB(229, 229, 229)
-	HeaderText.TextSize = 21.000
+	HeaderText.TextSize = 18.000
 	HeaderText.TextStrokeColor3 = Color3.fromRGB(205, 67, 218)
 	HeaderText.TextStrokeTransparency = 0.640
 
@@ -6240,7 +6240,7 @@ function Fatality.new(Window: Window)
 		StyledTextLabel.Text = Window.Name
 		StyledTextLabel.TextColor3 = Color3.fromRGB(247, 247, 248)
 		StyledTextLabel.TextScaled = true
-		StyledTextLabel.TextSize = 20.000
+		StyledTextLabel.TextSize = 19.000
 		StyledTextLabel.TextWrapped = true
 		StyledTextLabel.TextXAlignment = Enum.TextXAlignment.Left
 
