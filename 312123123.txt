@@ -4836,7 +4836,7 @@ function Fatality.new(Window: Window)
 
 		local text_size = Fatality:GetTextSize(menu_name);
 
-		MenuButton.Size = UDim2.new(0, text_size.X + 33, 0.85, 0)
+		MenuButton.Size = UDim2.new(0, text_size.X + 20, 0.85, 0)
 
 		local MenuLiber = Instance.new("Frame")
 		local Left = Instance.new("ScrollingFrame")
