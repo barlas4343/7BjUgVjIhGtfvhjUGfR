@@ -1,0 +1,10 @@
+C:\Users\qioxe\Desktop\Project Sadrc7\Project Sadrc7\bin\x64\Debug\Project Sadrc7.exe.config
+C:\Users\qioxe\Desktop\Project Sadrc7\Project Sadrc7\bin\x64\Debug\Project Sadrc7.exe
+C:\Users\qioxe\Desktop\Project Sadrc7\Project Sadrc7\bin\x64\Debug\Project Sadrc7.pdb
+C:\Users\qioxe\Desktop\Project Sadrc7\Project Sadrc7\obj\x64\Debug\Project Sadrc7.csproj.AssemblyReference.cache
+C:\Users\qioxe\Desktop\Project Sadrc7\Project Sadrc7\obj\x64\Debug\Project_Sadrc7.Form1.resources
+C:\Users\qioxe\Desktop\Project Sadrc7\Project Sadrc7\obj\x64\Debug\Project_Sadrc7.Properties.Resources.resources
+C:\Users\qioxe\Desktop\Project Sadrc7\Project Sadrc7\obj\x64\Debug\Project Sadrc7.csproj.GenerateResource.cache
+C:\Users\qioxe\Desktop\Project Sadrc7\Project Sadrc7\obj\x64\Debug\Project Sadrc7.csproj.CoreCompileInputs.cache
+C:\Users\qioxe\Desktop\Project Sadrc7\Project Sadrc7\obj\x64\Debug\Project Sadrc7.exe
+C:\Users\qioxe\Desktop\Project Sadrc7\Project Sadrc7\obj\x64\Debug\Project Sadrc7.pdb

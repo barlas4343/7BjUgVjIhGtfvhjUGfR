@@ -1,0 +1,11 @@
+C:\Users\MuffinS\Desktop\Project Sadrc7\Project Sadrc7\bin\x64\Release\Project Sadrc7.exe.config
+C:\Users\MuffinS\Desktop\Project Sadrc7\Project Sadrc7\bin\x64\Release\Project Sadrc7.exe
+C:\Users\MuffinS\Desktop\Project Sadrc7\Project Sadrc7\bin\x64\Release\Project Sadrc7.pdb
+C:\Users\MuffinS\Desktop\Project Sadrc7\Project Sadrc7\obj\x64\Release\Project Sadrc7.csproj.AssemblyReference.cache
+C:\Users\MuffinS\Desktop\Project Sadrc7\Project Sadrc7\obj\x64\Release\Project_Sadrc7.Form1.resources
+C:\Users\MuffinS\Desktop\Project Sadrc7\Project Sadrc7\obj\x64\Release\Project_Sadrc7.Properties.Resources.resources
+C:\Users\MuffinS\Desktop\Project Sadrc7\Project Sadrc7\obj\x64\Release\Project Sadrc7.csproj.GenerateResource.cache
+C:\Users\MuffinS\Desktop\Project Sadrc7\Project Sadrc7\obj\x64\Release\Project Sadrc7.csproj.CoreCompileInputs.cache
+C:\Users\MuffinS\Desktop\Project Sadrc7\Project Sadrc7\obj\x64\Release\Project Sadrc7.exe
+C:\Users\MuffinS\Desktop\Project Sadrc7\Project Sadrc7\obj\x64\Release\Project Sadrc7.pdb
+C:\Users\MuffinS\Desktop\Project Sadrc7\Project Sadrc7\obj\x64\Release\Project Sadrc7.exe.config
