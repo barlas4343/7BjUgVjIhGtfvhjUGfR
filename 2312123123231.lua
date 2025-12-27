@@ -1,4 +1,4 @@
-@ -1,38 +1,38 @@
+@ -1,63 +1,63 @@
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -38,3 +38,28 @@ local function fling()
 				hrp = nil
 			end
 
+			if hrp then
+				vel = hrp.Velocity
+				hrp.Velocity = vel * 100000000000000 + Vector3.new(0, 1000000000000, 0)
+				RunService.RenderStepped:Wait()
+				hrp.Velocity = vel
+				RunService.Stepped:Wait()
+				hrp.Velocity = vel + Vector3.new(0, movel, 0)
+				movel = -movel
+			end
+		end
+	end
+end
+
+-- API dışarı aktarılıyor
+return {
+	fling = function()
+		stopFling = false
+		return coroutine.create(fling)
+	end,
+	stop = function()
+		stopFling = true
+	end,
+	enableGui = function() end, -- GUI devre dışı
+	disableGui = function() end
+}
