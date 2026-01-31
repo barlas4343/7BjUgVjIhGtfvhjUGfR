@@ -814,28 +814,27 @@ Window["TabsHolder"] = InnerBorder_InnerFrame_Tabs
 Window["PagesHolder"] = InnerBorder_InnerFrame_Folder
 end
 do
-    utility:CreateConnection(uis.InputBegan, function(Input)
-        if Input.KeyCode == Window.Key then
-            Window.Enabled = not Window.Enabled
-            if Window.Enabled then
-                -- Menü açılırken hemen input'u aktif et, sonra fade in
-                ScreenGui.Enabled = true
-                Window:Fade(true)
-            else
-                -- Menü kapanırken önce fade out yap, sonra input'u tamamen kapat
-                Window:Fade(false)
-                task.delay(0.3, function()
-                    if not Window.Enabled then -- Tekrar açılmışsa yanlışlıkla kapatmasın
-                        ScreenGui.Enabled = false
-                    end
-                end)
+utility:CreateConnection(uis.InputBegan, function(Input)
+    -- Menü toggle
+    if Input.KeyCode == Window.Key then
+        Window.Enabled = not Window.Enabled
+
+        if Window.Enabled then
+            -- Menü açılırken
+            ScreenGui.Enabled = true
+            Window:Fade(true)
+        else
+            -- Menü kapanırken
+            Window:Fade(false)
+            task.delay(0.3, function()
+                if not Window.Enabled then
+                    ScreenGui.Enabled = false
+                end
+            end)
         end
-        elseif Input.KeyCode == Enum.KeyCode.NONE then
-            Window:Unload()
-        end
-    end)
-end
-end
+    end
+end)
+
 return setmetatable(Window, library)
 end
 --
